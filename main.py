@@ -1,6 +1,10 @@
-print(2 + 2)
+## Этап 1. Начало работы с aiogram3
+
+# Установить aiogram3
+# pip install aiogram3
+
+
 
 # TODO
-# - git
 # - aiogram3
 
