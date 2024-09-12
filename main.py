@@ -21,15 +21,23 @@ dp = Dispatcher()
 
 
 # 3. Создание обработчиков
-# -- Обработчик (handler) --
+# -- Обработчики (handler) --
 @dp.message(filters.CommandStart())  # декоратора диспетчера
 async def command_start_handler(message: types.Message) -> None:
+    """команда /start"""
     # await message.answer("Hello!")
     await message.answer(f"Hello, {message.from_user.username}!")
 
 
+@dp.message()
+async def echo_handler(message: types.Message) -> None:
+    """эхо-ответ"""
+    await message.send_copy(chat_id=message.chat.id)
+
+
 # -- Вспомогательная функция (utils) --
 async def main() -> None:
+    """polling-запуск проекта"""
     await dp.start_polling(bot)
 
 
