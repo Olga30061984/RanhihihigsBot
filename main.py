@@ -1,4 +1,4 @@
-## Этап 1. Начало работы с aiogram3
+## Этап 2. Переменные окружения, логирование и маршрутизация
 
 # Дополнительный гайд по aiogram3 https://mastergroosha.github.io/aiogram-3-guide/
 # Документация по aiogram3 https://docs.aiogram.dev/en/latest/
@@ -7,6 +7,11 @@
 # 0. Установить зависимости
 # pip install aiogram
 # pip install python-dotenv
+
+# TODOs-list
+# OK - настроить переменные окружения
+# TODO - добавить логирование (используя ветки)
+# TODO - сделать маршрутизацию вместо декораторов
 
 # 1. Импорт
 import asyncio  # асинхронный ввод-вывод
