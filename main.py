@@ -4,8 +4,9 @@
 # Документация по aiogram3 https://docs.aiogram.dev/en/latest/
 # Ссылка на форум aiogram в тг: https://t.me/aiogram
 
-# 0. Установить aiogram3
+# 0. Установить зависимости
 # pip install aiogram
+# pip install python-dotenv
 
 # 1. Импорт
 import asyncio  # асинхронный ввод-вывод
