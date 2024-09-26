@@ -13,7 +13,8 @@ import logging  # чтобы отследить состояние бота, и�
 import asyncio  # асинхронный ввод-вывод
 from aiogram import Bot, Dispatcher, types, filters  # класс бота и диспетчера
 from config import TOKEN
-from handlers import register_message_handler
+from handlers import register_message_handler, commands_for_bot
+from db import async_create_table
 
 
 async def main() -> None:
@@ -29,10 +30,17 @@ async def main() -> None:
     # Функция для вызова обработчиков
     await register_message_handler(dp)
 
+    # Загрузка команд
+    await bot.set_my_commands(commands=commands_for_bot)
+
     # polling-запуск
     await dp.start_polling(bot)
 
 
 # 5. Запуск
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(async_create_table())
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logging.info("GoodBye!")
