@@ -6,7 +6,13 @@ Telgram bot for ranepa evening education
 1. Склонируйте репозиторий
 
 ```
-git clone <>
+git clone git@github.com:pyshkovni/RanhihihigsBot.git
+```
+
+Стяните также ветку develop
+
+```
+git checkout -b develop origin/develop
 ```
 
 2. Установите зависимости в изолированной среде (например, venv)
