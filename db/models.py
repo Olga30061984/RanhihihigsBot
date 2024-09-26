@@ -20,4 +20,4 @@ class User(Base):
 
     user_id = Column(Integer, primary_key=True)
     username = Column(VARCHAR(32), unique=False, nullable=False)
-    reg_data = Column(DATE, default=datetime.now())
+    reg_date = Column(DATE, default=datetime.now())

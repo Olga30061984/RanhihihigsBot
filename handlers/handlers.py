@@ -9,7 +9,15 @@ __all__ = [
 # Установить общий уровень логирования и создали экземпляр лога
 import logging
 from aiogram import Router, types, filters
+from db import async_session, User
+from sqlalchemy import select, insert
 
+# справочная информация
+help_string = """
+Вас приветствует бот YaDiskBot!
+ℹ️ Вы можете вывести справочную информацию по боту — /help
+👨🏻‍🦱 Узнать статус пользователя — /status
+"""
 
 # настройка логирования
 logging.basicConfig(level=logging.DEBUG)
@@ -17,9 +25,38 @@ logger = logging.getLogger(__name__)
 
 
 async def command_start_handler(message: types.Message) -> None:
-    """Команда /start"""
-    await message.answer(f"Hello, {message.from_user.username}!")
-    logger.info(f"user {message.from_user.id} starts bot!")
+    """Команда регистрации и справки /start, /help"""
+
+    async with async_session() as session:
+        query = select(User).where(message.from_user.id == User.user_id)
+        user_exists = await session.execute(query)
+
+        if user_exists.scalars().all():
+            await message.answer(help_string)
+        else:
+            new_user = {
+                'user_id': message.from_user.id,
+                'username': message.from_user.username,
+            }
+            insert_query = insert(User).values(**new_user)
+            await session.execute(insert_query)
+            await session.commit()
+            await message.answer(help_string)
+            logger.info(f"register new user {message.from_user.id}")
+
+
+async def command_status_handler(message: types.Message) -> None:
+    """Команда информации о пользователе /status"""
+
+    async with async_session() as session:
+        query = select(User).where(message.from_user.id == User.user_id)
+        result = await session.execute(query)
+        user = result.scalar()
+        info = (f"<b>UserId</b>: <i>{user.user_id}</i>\n"
+                f"<b>UserName</b>: <i>{user.username}</i>)\n"
+                f"<b>Registration Date</b>: <i>{user.reg_date}</i>")
+        await message.answer(info, parse_mode="HTML")
+        logger.info(f"user {message.from_user.id} asks for status!")
 
 
 async def process_unknown_command(message: types.Message) -> None:
@@ -31,4 +68,5 @@ async def process_unknown_command(message: types.Message) -> None:
 async def register_message_handler(router: Router):
     """Маршрутизация"""
     router.message.register(command_start_handler, filters.Command(commands=["help", "start"]))
+    router.message.register(command_status_handler, filters.Command(commands=["status"]))
     router.message.register(process_unknown_command)
