@@ -13,7 +13,7 @@ import logging  # чтобы отследить состояние бота, и�
 import asyncio  # асинхронный ввод-вывод
 from aiogram import Bot, Dispatcher, types, filters  # класс бота и диспетчера
 from config import TOKEN
-from handlers import register_message_handler
+from handlers import register_message_handler, commands_for_bot
 
 
 async def main() -> None:
@@ -28,6 +28,9 @@ async def main() -> None:
 
     # Функция для вызова обработчиков
     await register_message_handler(dp)
+
+    # Загрузка команд
+    await bot.set_my_commands(commands=commands_for_bot)
 
     # polling-запуск
     await dp.start_polling(bot)
