@@ -8,9 +8,12 @@ __all__ = [
 
 # Установить общий уровень логирования и создали экземпляр лога
 import logging
-from aiogram import Router, types, filters
+from aiogram import Router, types, filters, F
 from db import async_session, User
 from sqlalchemy import select, insert
+from .keyboards import keyboard_continue
+from .callbacks import callback_continue
+
 
 # справочная информация
 help_string = """
@@ -58,6 +61,8 @@ async def command_status_handler(message: types.Message) -> None:
         await message.answer(info, parse_mode="HTML")
         logger.info(f"user {message.from_user.id} asks for status!")
 
+    await message.reply("Хотите продолжить?", reply_markup=keyboard_continue)
+
 
 async def process_unknown_command(message: types.Message) -> None:
     """эхо-ответ"""
@@ -69,4 +74,5 @@ async def register_message_handler(router: Router):
     """Маршрутизация"""
     router.message.register(command_start_handler, filters.Command(commands=["help", "start"]))
     router.message.register(command_status_handler, filters.Command(commands=["status"]))
+    router.callback_query.register(callback_continue, F.data.startswith("continue_"))
     router.message.register(process_unknown_command)
