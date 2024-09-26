@@ -22,13 +22,13 @@ async def command_start_handler(message: types.Message) -> None:
     logger.info(f"user {message.from_user.id} starts bot!")
 
 
-async def echo_handler(message: types.Message) -> None:
+async def process_unknown_command(message: types.Message) -> None:
     """эхо-ответ"""
-    await message.send_copy(chat_id=message.chat.id)
-    logger.info(f"user {message.from_user.id} send text and get echo!")
+    await message.reply(text="Неподдерживаемая команда. Введите /help для справки.")
+    logger.info(f"user {message.from_user.id} send unknown message or command!")
 
 
 async def register_message_handler(router: Router):
     """Маршрутизация"""
-    router.message.register(command_start_handler, filters.CommandStart())
-    router.message.register(echo_handler)
+    router.message.register(command_start_handler, filters.Command(commands=["help", "start"]))
+    router.message.register(process_unknown_command)
