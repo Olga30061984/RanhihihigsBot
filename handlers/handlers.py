@@ -13,6 +13,8 @@ from db import async_session, User
 from sqlalchemy import select, insert
 from .keyboards import keyboard_continue
 from .callbacks import callback_continue
+from .keyboards import keyboard_who
+from .callbacks import callback_who
 
 
 # справочная информация
@@ -20,6 +22,7 @@ help_string = """
 Вас приветствует бот YaDiskBot!
 ℹ️ Вы можете вывести справочную информацию по боту — /help
 👨🏻‍🦱 Узнать статус пользователя — /status
+👨🏻‍🦱 Зарегистрировать пользователя в Яндекс.Диск — /register
 """
 
 # настройка логирования
@@ -37,6 +40,7 @@ async def command_start_handler(message: types.Message) -> None:
         if user_exists.scalars().all():
             await message.answer(help_string)
         else:
+            await message.reply("Вы кто?", reply_markup=keyboard_who)
             new_user = {
                 'user_id': message.from_user.id,
                 'username': message.from_user.username,
@@ -64,6 +68,19 @@ async def command_status_handler(message: types.Message) -> None:
     await message.reply("Хотите продолжить?", reply_markup=keyboard_continue)
 
 
+async def command_register_handler(message: types.Message) -> None:
+    """Команда регистрации пользователя /register"""
+
+    async with async_session() as session:
+        query = select(User).where(message.from_user.id == User.user_id)
+        result = await session.execute(query)
+        user = result.scalar()
+        await message.answer("https://oauth.yandex.ru/client/new", parse_mode="HTML")
+        logger.info(f"user {message.from_user.id} reg!")
+
+    await message.reply("Пройдите по ссылке", reply_markup=keyboard_continue)
+
+
 async def process_unknown_command(message: types.Message) -> None:
     """эхо-ответ"""
     await message.reply(text="Неподдерживаемая команда. Введите /help для справки.")
@@ -74,5 +91,7 @@ async def register_message_handler(router: Router):
     """Маршрутизация"""
     router.message.register(command_start_handler, filters.Command(commands=["help", "start"]))
     router.message.register(command_status_handler, filters.Command(commands=["status"]))
+    router.message.register(command_register_handler, filters.Command(commands=["register"]))
     router.callback_query.register(callback_continue, F.data.startswith("continue_"))
+    router.callback_query.register(callback_who, F.data.startswith("who_"))
     router.message.register(process_unknown_command)
